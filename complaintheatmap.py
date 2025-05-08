@@ -4,10 +4,7 @@ import numpy as np
 
 # Load the CSV file with error handling
 try:
-    df = pd.read_csv("emailautofill/postcode_coordinates.csv")  # Adjusted path to 'emailautofill'
-except FileNotFoundError:
-    st.error("CSV file not found. Please ensure 'postcode_coordinates.csv' is in the 'emailautofill' folder.")
-    st.stop()
+    df = pd.read_csv("complaintheatmap/postcode_coordinates.csv")  
 
 # Validate that the required columns exist
 required_columns = {'postcode', 'lat', 'lon', 'sub_category'}
