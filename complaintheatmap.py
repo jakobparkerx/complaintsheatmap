@@ -1,13 +1,36 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import os
+
+# Set the default file path
+default_file_path = "complaintheatmap/postcode_coordinates.csv"
+
+# Function to dynamically resolve the file path
+def get_csv_file_path():
+    # Check if the file exists at the default path
+    if os.path.exists(default_file_path):
+        return default_file_path
+    else:
+        # Display a message to upload the file if not found
+        st.warning("Default CSV file not found. Please upload the CSV file.")
+        uploaded_file = st.file_uploader("Upload your CSV file", type="csv")
+        if uploaded_file:
+            return uploaded_file
+        else:
+            return None
 
 # Load the CSV file with error handling
-try:
-    df = pd.read_csv("complaintheatmap/postcode_coordinates.csv")
-except FileNotFoundError:
-    st.error("CSV file not found. Please ensure the file path is correct.")
+file_path = get_csv_file_path()
+if file_path is None:
+    st.error("No CSV file provided. Please upload a valid file.")
     st.stop()
+
+try:
+    if isinstance(file_path, str):
+        df = pd.read_csv(file_path)
+    else:
+        df = pd.read_csv(file_path)  # For uploaded files
 except pd.errors.EmptyDataError:
     st.error("CSV file is empty. Please provide a valid file.")
     st.stop()
