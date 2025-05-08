@@ -1,58 +1,28 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-import os
 
-# Set the default file path
-default_file_path = "complaintheatmap/postcode_coordinates.csv"
+# Try to load the default CSV file
+default_file = "postcode_coordinates.csv"
 
-# Function to dynamically resolve the file path
-def get_csv_file_path():
-    # If the default file exists, return its path, otherwise prompt the user to upload
-    if os.path.exists(default_file_path):
-        return default_file_path
-    else:
-        st.warning("Default CSV file not found. Please upload the CSV file.")
-        uploaded_file = st.file_uploader("Upload your CSV file", type="csv")
-        return uploaded_file if uploaded_file else None
+df = None
 
-# Load the CSV file with error handling
-file_path = get_csv_file_path()
-if file_path is None:
-    st.error("No CSV file provided. Please upload a valid file.")
-    st.stop()
+if st.button("Load default CSV"):
+    try:
+        df = pd.read_csv(default_file)
+        st.success(f"Loaded default CSV: {default_file}")
+    except FileNotFoundError:
+        st.warning(f"Default CSV not found at {default_file}")
 
-try:
-    # Load the CSV file into DataFrame
-    df = pd.read_csv(file_path)
-except pd.errors.EmptyDataError:
-    st.error("CSV file is empty. Please provide a valid file.")
-    st.stop()
-except Exception as e:
-    st.error(f"An unexpected error occurred: {e}")
-    st.stop()
+# Allow user to upload their own CSV file
+uploaded_file = st.file_uploader("Or upload your CSV file", type="csv")
 
-# Validate that the required columns exist
-required_columns = {'postcode', 'lat', 'lon', 'sub_category'}
-if not required_columns.issubset(df.columns):
-    st.error(f"CSV file is missing one or more required columns: {required_columns}")
-    st.stop()
+if uploaded_file is not None:
+    df = pd.read_csv(uploaded_file)
+    st.success("Uploaded CSV file successfully!")
 
-# Add noise to coordinates to avoid overlapping points (optional but helps with map visualization)
-noise = np.random.normal(0, 0.0001, df.shape[0])  # Small random noise to add to coordinates
-df['lon'] = df['lon'] + noise
-df['lat'] = df['lat'] + noise
+# Display the dataframe if loaded
+if df is not None:
+    st.write("Preview of the data:")
+    st.dataframe(df)
 
-# Streamlit app setup
-st.title("UK Postcode Complaints Heatmap")
-
-# Add a dropdown to select the complaint sub-category
-sub_categories = df['sub_category'].unique()
-selected_sub_category = st.selectbox("Select Complaint Sub-Category", sub_categories)
-
-# Filter the dataframe based on the selected sub-category
-filtered_df = df[df['sub_category'] == selected_sub_category]
-
-# Display the filtered map
-st.map(filtered_df)
 
