@@ -1,37 +1,36 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
+import pydeck as pdk
 
-# Title
-st.title("UK Postcode Complaints Scatter Map")
+# Load your CSV
+df = pd.read_csv("postcode_coordinates.csv")
 
-# Load the default CSV file
-default_file = "postcode_coordinates.csv"
+# Streamlit app title
+st.title("UK Postcode Complaints Heatmap")
 
-try:
-    df = pd.read_csv(default_file)
-except FileNotFoundError:
-    st.error(f"Default CSV not found at {default_file}. Please make sure the file exists.")
-    st.stop()
-
-# Validate required columns
-required_columns = {'postcode', 'lat', 'lon', 'sub_category'}
-if not required_columns.issubset(df.columns):
-    st.error(f"CSV file is missing required columns: {required_columns}")
-    st.stop()
-
-# Add slight noise to prevent overlapping points
-noise = np.random.normal(0, 0.0001, df.shape[0])
-df['lon'] = df['lon'] + noise
-df['lat'] = df['lat'] + noise
-
-# Dropdown filter for sub_category
+# Dropdown to select sub_category
 sub_categories = df['sub_category'].unique()
 selected_sub_category = st.selectbox("Select Complaint Sub-Category", sub_categories)
 
 # Filter data
 filtered_df = df[df['sub_category'] == selected_sub_category]
 
-# Display scatter map
-st.map(filtered_df)
+# Pydeck scatter map
+layer = pdk.Layer(
+    'ScatterplotLayer',
+    data=filtered_df,
+    get_position='[lon, lat]',
+    get_fill_color='[200, 30, 0, 160]',
+    get_radius=500,  # 500 meters radius for each point
+)
+
+view_state = pdk.ViewState(
+    latitude=filtered_df['lat'].mean(),
+    longitude=filtered_df['lon'].mean(),
+    zoom=6,
+    pitch=0,
+)
+
+# Show the map
+st.pydeck_chart(pdk.Deck(layers=[layer], initial_view_state=view_state))
 
