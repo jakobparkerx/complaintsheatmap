@@ -20,14 +20,14 @@ layer = pdk.Layer(
     'ScatterplotLayer',
     data=filtered_df,
     get_position='[lon, lat]',
-    get_fill_color='[200, 30, 0, 160]',
-    get_radius=500,  # 500 meters radius for each point
+    get_fill_color='[255, 0, 0, 255]',
+    get_radius=1500,  
 )
 
 view_state = pdk.ViewState(
     latitude=filtered_df['lat'].mean(),
     longitude=filtered_df['lon'].mean(),
-    zoom=6,
+    zoom=7,
     pitch=0,
 )
 
