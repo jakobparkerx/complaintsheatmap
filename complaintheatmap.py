@@ -6,7 +6,7 @@ import pydeck as pdk
 df = pd.read_csv("postcode_coordinates.csv")
 
 # Streamlit app title
-st.title("UK Postcode Complaints Heatmap")
+st.title("2024 'Appointment Needed' Complaints Heatmap")
 
 # Dropdown to select sub_category
 sub_categories = df['sub_category'].unique()
