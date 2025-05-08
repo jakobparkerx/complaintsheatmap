@@ -4,7 +4,16 @@ import numpy as np
 
 # Load the CSV file with error handling
 try:
-    df = pd.read_csv("complaintheatmap/postcode_coordinates.csv")  
+    df = pd.read_csv("complaintheatmap/postcode_coordinates.csv")
+except FileNotFoundError:
+    st.error("CSV file not found. Please ensure the file path is correct.")
+    st.stop()
+except pd.errors.EmptyDataError:
+    st.error("CSV file is empty. Please provide a valid file.")
+    st.stop()
+except Exception as e:
+    st.error(f"An unexpected error occurred: {e}")
+    st.stop()
 
 # Validate that the required columns exist
 required_columns = {'postcode', 'lat', 'lon', 'sub_category'}
