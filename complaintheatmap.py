@@ -2,20 +2,20 @@ import streamlit as st
 import pandas as pd
 import pydeck as pdk
 
-# Load your CSV
+
 df = pd.read_csv("postcode_coordinates.csv")
 
-# Streamlit app title
+
 st.title("2024 'Appointment Needed' Complaints Heatmap")
 
-# Dropdown to select sub_category
+
 sub_categories = df['sub_category'].unique()
 selected_sub_category = st.selectbox("Select Complaint Sub-Category", sub_categories)
 
-# Filter data
+
 filtered_df = df[df['sub_category'] == selected_sub_category]
 
-# Pydeck scatter map
+
 layer = pdk.Layer(
     'ScatterplotLayer',
     data=filtered_df,
@@ -31,6 +31,6 @@ view_state = pdk.ViewState(
     pitch=0,
 )
 
-# Show the map
+
 st.pydeck_chart(pdk.Deck(layers=[layer], initial_view_state=view_state))
 
